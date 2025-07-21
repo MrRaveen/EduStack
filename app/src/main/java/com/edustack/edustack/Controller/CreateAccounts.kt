@@ -12,44 +12,6 @@ import kotlinx.coroutines.withContext
 
 class CreateAccounts : ViewModel(){
     val db = Firebase.firestore
-//    suspend fun CreateStudentAccount(createData: CreateStudentAccRequest): Boolean = withContext(Dispatchers.IO) {
-//        try {
-//            // 1. Create StudentInfo document
-//            val studentInfoData = hashMapOf(
-//                "Address" to createData.address,
-//                "City" to createData.city,
-//                "ContactNumber" to createData.contactNumber,
-//                "DOB" to createData.dob,
-//                "Email" to createData.email,
-//                "Fname" to createData.firstName,
-//                "Lname" to createData.lastName,
-//                "School" to createData.school,
-//                "Gender" to createData.gender,
-//                "JoinedDate" to FieldValue.serverTimestamp()  // Add joined date
-//            )
-//
-//            // Add document to StudentInfo collection
-//            val studentInfoRef = db.collection("StudentInfo").document()
-//            studentInfoRef.set(studentInfoData).await()
-//
-//            // Get the auto-generated document ID
-//            val studentInfoId = studentInfoRef.id
-//
-//            // 2. Create StudentAcc document
-//            val studentAccData = hashMapOf(
-//                "Password" to createData.password,
-//                "Status" to true,
-//                "StudentInfoID" to studentInfoId,
-//                "UserName" to createData.userName
-//            )
-//            db.collection("StudentAcc").document().set(studentAccData).await()
-//
-//            return@withContext true
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return@withContext false
-//        }
-//    }
 
     suspend fun CreateStudentAccount(createData: CreateStudentAccRequest): Boolean = withContext(Dispatchers.IO) {
         try {

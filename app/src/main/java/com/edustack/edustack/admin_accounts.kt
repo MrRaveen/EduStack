@@ -193,45 +193,6 @@ class admin_accounts : Fragment() {
             dialogView.show()
         }
         //TODO: Add student
-//        val addStudentBtn = view?.findViewById<Button>(R.id.btnAddStudent)
-//        addStudentBtn?.setOnClickListener {
-//            val dialogView = BottomSheetDialog(requireContext())
-//            val viewBottom = layoutInflater.inflate(R.layout.create_new_student, null)
-//            val closePanelBtn = viewBottom.findViewById<Button>(R.id.closeCreateAccStuPanel)
-//            closePanelBtn.setOnClickListener {
-//                dialogView.dismiss()
-//            }
-//            //date popup
-//            val datePickerStart = Dialog(requireContext())
-//            datePickerStart.setContentView(R.layout.date_picker_start)
-//            val dateTrigButton = viewBottom.findViewById<Button>(R.id.dateForDOB)//panel side triger
-//            val dateUIStart: DatePicker = datePickerStart.findViewById(R.id.datePickerStart)//date ui/ start
-//            val dateActionBtnStart: Button = datePickerStart.findViewById(R.id.setDateStart)//date select btn/end
-//            val createAccStu: Button = datePickerStart.findViewById(R.id.createStudentAccBtn)//date select btn/end
-//            createAccStu.setOnClickListener {
-//                //student account create button
-//            }
-//            dateTrigButton.setOnClickListener {
-//                datePickerStart.window?.setLayout(
-//                    ViewGroup.LayoutParams.WRAP_CONTENT,
-//                    ViewGroup.LayoutParams.WRAP_CONTENT
-//                )
-//                datePickerStart.setCancelable(false)
-//                datePickerStart.show()
-//            }
-//            dateActionBtnStart.setOnClickListener {
-//                with(dateUIStart) {
-//                    val day = dayOfMonth
-//                    val month = month
-//                    val year = year
-//                    dateTrigButton.text = "$day/$month/$year"
-//                }
-//                datePickerStart.dismiss()
-//            }
-//            dialogView.setCancelable(false)
-//            dialogView.setContentView(viewBottom)
-//            dialogView.show()
-//        }
         val addStudentBtn = view?.findViewById<Button>(R.id.btnAddStudent)
         addStudentBtn?.setOnClickListener {
             val dialogView = BottomSheetDialog(requireContext())
