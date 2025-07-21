@@ -17,7 +17,6 @@ import kotlin.coroutines.suspendCoroutine
 
 class AccountDetails : ViewModel() {
     val db = Firebase.firestore
-
     suspend fun getStudentAccDetails(): List<StudentAccounts> = withContext(Dispatchers.IO) {
         try {
             suspendCoroutine<List<StudentAccounts>> { continuation ->
@@ -92,6 +91,37 @@ class AccountDetails : ViewModel() {
             return@withContext true
         } catch (e: Exception) {
             Log.e("AccountDetails", "Error updating account details: ${e.message}")
+            return@withContext false
+        }
+    }
+    suspend fun removeAccount(studentID: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            // 1. Find the student document using StudentInfoID
+            val querySnapshot = db.collection("StudentAcc")
+                .whereEqualTo("StudentInfoID", studentID)
+                .limit(1)
+                .get()
+                .await()
+
+            if (querySnapshot.isEmpty) {
+                return@withContext false
+            }
+
+            val document = querySnapshot.documents[0]
+            val docId = document.id
+
+            // 2. Delete from StudentAcc collection
+            db.collection("StudentAcc").document(docId)
+                .delete()
+                .await()
+
+            // 3. Delete from StudentInfo collection
+            db.collection("StudentInfo").document(studentID)
+                .delete()
+                .await()
+
+            return@withContext true
+        } catch (e: Exception) {
             return@withContext false
         }
     }

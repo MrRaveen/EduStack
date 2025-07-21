@@ -30,6 +30,7 @@ import com.edustack.edustack.R
 import com.edustack.edustack.databinding.ActivityAdminMenuBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.w3c.dom.Text
 
@@ -304,53 +305,53 @@ class admin_accounts : Fragment() {
                         viewBottom.findViewById<EditText>(R.id.city).setText("City is empty")
                         count++
                     }
-//                    if(count != 0){
-//
-//                    }
-                    //update call
-                    val updateData = updateRequest(
-                        id = student.id,
-                        address = viewBottom.findViewById<EditText>(R.id.address).text.toString(),
-                        city = viewBottom.findViewById<EditText>(R.id.city).text.toString(),
-                        contactNumber = viewBottom.findViewById<EditText>(R.id.contactNumber).text.toString(),
-                        email = viewBottom.findViewById<EditText>(R.id.email).text.toString(),
-                        firstName = viewBottom.findViewById<EditText>(R.id.FirstName).text.toString(),
-                        lastName = viewBottom.findViewById<EditText>(R.id.lastName).text.toString(),
-                        school = viewBottom.findViewById<EditText>(R.id.schoolName).text.toString(),
-                        userNameNew = viewBottom.findViewById<EditText>(R.id.userNameNew).text.toString(),
-                        newPassword = viewBottom.findViewById<EditText>(R.id.userPassword).text.toString()
-                    )
-                    lifecycleScope.launch {
-                        try{
-                            val result = accountDetailsViewModel.updateAccDetails(updateData)
-                            if(result == true){
-                                dialogView.dismiss()
+                    if(count != 0){
+                        //update call
+                        val updateData = updateRequest(
+                            id = student.id,
+                            address = viewBottom.findViewById<EditText>(R.id.address).text.toString(),
+                            city = viewBottom.findViewById<EditText>(R.id.city).text.toString(),
+                            contactNumber = viewBottom.findViewById<EditText>(R.id.contactNumber).text.toString(),
+                            email = viewBottom.findViewById<EditText>(R.id.email).text.toString(),
+                            firstName = viewBottom.findViewById<EditText>(R.id.FirstName).text.toString(),
+                            lastName = viewBottom.findViewById<EditText>(R.id.lastName).text.toString(),
+                            school = viewBottom.findViewById<EditText>(R.id.schoolName).text.toString(),
+                            userNameNew = viewBottom.findViewById<EditText>(R.id.userNameNew).text.toString(),
+                            newPassword = viewBottom.findViewById<EditText>(R.id.userPassword).text.toString()
+                        )
+                        lifecycleScope.launch {
+                            try{
+                                val result = accountDetailsViewModel.updateAccDetails(updateData)
+                                if(result == true){
+                                    dialogView.dismiss()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Data updated",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    view?.findViewById<FrameLayout>(R.id.panelID1Accounts)
+                                        ?.removeAllViews()
+                                    val fragmentManager = requireActivity().supportFragmentManager
+                                    val fragmentTransaction = fragmentManager.beginTransaction()
+                                    fragmentTransaction.replace(R.id.panelID1Accounts, admin_accounts())
+                                    fragmentTransaction.commit()
+                                }else{
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Error occured when updating data",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }catch (e : Exception){
                                 Toast.makeText(
                                     requireContext(),
-                                    "Data updated",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                view?.findViewById<FrameLayout>(R.id.panelID1Accounts)
-                                    ?.removeAllViews()
-                                val fragmentManager = requireActivity().supportFragmentManager
-                                val fragmentTransaction = fragmentManager.beginTransaction()
-                                fragmentTransaction.replace(R.id.panelID1Accounts, admin_accounts())
-                                fragmentTransaction.commit()
-                            }else{
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Error occured when updating data",
+                                    "Error occured when updating data: ${e.toString()}",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                        }catch (e : Exception){
-                            Toast.makeText(
-                                requireContext(),
-                                "Error occured when updating data: ${e.toString()}",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
                     }
+
                 }
             closePanelBtn.setOnClickListener {
                 dialogView.dismiss()
@@ -361,8 +362,48 @@ class admin_accounts : Fragment() {
             }
 
             cardView.findViewById<MaterialButton>(R.id.btnDelete).setOnClickListener {
-                //remove student account
-
+                // remove account
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Delete Account")
+                    .setMessage("Are you sure you want to delete this student account?")
+                    .setPositiveButton("Delete") { dialog, _ ->
+                        lifecycleScope.launch {
+                            try {
+                                val result = accountDetailsViewModel.removeAccount(student.id)
+                                if (result == true) {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Account deleted",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    // Refresh the fragment
+                                    view?.findViewById<FrameLayout>(R.id.panelID1Accounts)
+                                        ?.removeAllViews()
+                                    val fragmentManager = requireActivity().supportFragmentManager
+                                    val fragmentTransaction = fragmentManager.beginTransaction()
+                                    fragmentTransaction.replace(R.id.panelID1Accounts, admin_accounts())
+                                    fragmentTransaction.commit()
+                                } else {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Failed to delete account",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
             }
 
             cardView.findViewById<MaterialButton>(R.id.btnView).setOnClickListener {
