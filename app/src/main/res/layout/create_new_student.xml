@@ -78,6 +78,21 @@
                         android:importantForAutofill="yes"/>
                 </LinearLayout>
             </LinearLayout>
+            <!-- Gender Selection -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gender"
+                android:textSize="16sp"
+                android:layout_marginBottom="5dp"/>
+
+            <Spinner
+                android:id="@+id/genderSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_search_background"
+                android:padding="10dp"
+                android:layout_marginBottom="8dp"/>
             <!--address name-->
             <TextView
                 android:layout_width="match_parent"
