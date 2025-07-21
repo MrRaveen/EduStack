@@ -166,7 +166,6 @@
             android:gravity="center_vertical"
             android:layout_marginHorizontal="20dp"
         >
-
             <!-- Combo box -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
