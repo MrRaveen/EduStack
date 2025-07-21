@@ -23,7 +23,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.edustack.edustack.Controller.AccountDetails
 import com.edustack.edustack.Controller.GetStudentCount
+import com.edustack.edustack.Controller.TeacherAccountDetails
 import com.edustack.edustack.Models.StudentAccounts
+import com.edustack.edustack.Models.TeacherAccounts
+import com.edustack.edustack.Models.TeacherUpdateRequest
 import com.edustack.edustack.Models.updateRequest
 import com.edustack.edustack.Notifications
 import com.edustack.edustack.R
@@ -43,6 +46,7 @@ class admin_accounts : Fragment() {
     // TODO: Rename and change types of parameters
     private lateinit var cardsContainer: LinearLayout
     val accountDetailsViewModel by viewModels<AccountDetails>()//acc details controller call
+    val accountDetailsTeacher by viewModels<TeacherAccountDetails>()
     private var param1: String? = null
     private var param2: String? = null
 
@@ -122,7 +126,6 @@ class admin_accounts : Fragment() {
             }
             accountTypeDropdown.setOnItemClickListener { _, _, position, _ ->
                 if(accountTypes[position] == "Student"){
-//                    val accountDetailsViewModel by viewModels<AccountDetails>()//acc details controller call
                     lifecycleScope.launch {
                         try {
                             val students = accountDetailsViewModel.getStudentAccDetails()
@@ -131,8 +134,16 @@ class admin_accounts : Fragment() {
                             Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
-                }else if(accountTypes[position] == "Teacher"){
-
+                }else if(accountTypes[position] == "Teacher") {
+                    lifecycleScope.launch {
+                        try {
+                            val teachers = accountDetailsTeacher.getTeacherAccountDetails()
+                            //Toast.makeText(requireContext(), "out: ${teachers.toString()}", Toast.LENGTH_SHORT).show()
+                            renderTeacherCards(teachers)
+                        } catch (e: Exception) {
+                            Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }
@@ -188,6 +199,10 @@ class admin_accounts : Fragment() {
             val dateTrigButton = viewBottom.findViewById<Button>(R.id.dateForDOB)//panel side triger
             val dateUIStart: DatePicker = datePickerStart.findViewById(R.id.datePickerStart)//date ui/ start
             val dateActionBtnStart: Button = datePickerStart.findViewById(R.id.setDateStart)//date select btn/end
+            val createAccStu: Button = datePickerStart.findViewById(R.id.createStudentAccBtn)//date select btn/end
+            createAccStu.setOnClickListener {
+
+            }
             dateTrigButton.setOnClickListener {
                 datePickerStart.window?.setLayout(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -228,6 +243,161 @@ class admin_accounts : Fragment() {
             }
         }
     }
+    private fun renderTeacherCards(teachers: List<TeacherAccounts>) {
+        cardsContainer.removeAllViews()  // Clear existing views
+        val inflater = LayoutInflater.from(requireContext())
+
+        teachers.forEach { teacher ->
+            val cardView = inflater.inflate(R.layout.student_card_acc, cardsContainer, false) as CardView
+
+            // Set teacher information
+            cardView.findViewById<TextView>(R.id.tvName).text = "Name: ${teacher.FirstName} ${teacher.LastName}"
+            cardView.findViewById<TextView>(R.id.tvAccountId).text = "Account ID: ${teacher.id}"
+            cardView.findViewById<TextView>(R.id.tvEmail).text = "Email: ${teacher.Speciality}"
+
+            // Edit Button Click
+            cardView.findViewById<MaterialButton>(R.id.btnEdit).setOnClickListener {
+                val dialogView = BottomSheetDialog(requireContext())
+                val viewBottom = layoutInflater.inflate(R.layout.edit_teacher_info, null)
+
+                // Pre-fill form with current data
+                viewBottom.findViewById<EditText>(R.id.FirstName).setText(teacher.FirstName)
+                viewBottom.findViewById<EditText>(R.id.lastName).setText(teacher.LastName)
+                viewBottom.findViewById<EditText>(R.id.address).setText(teacher.Address)
+                viewBottom.findViewById<EditText>(R.id.speciality).setText(teacher.Speciality)
+                viewBottom.findViewById<EditText>(R.id.email).setText(teacher.Email)
+                viewBottom.findViewById<EditText>(R.id.contactNumber).setText(teacher.ContactNumber)
+                viewBottom.findViewById<EditText>(R.id.city).setText(teacher.City)
+
+                // Set up buttons
+                val updateButton = viewBottom.findViewById<Button>(R.id.updateInfoBtn)
+                val closePanelBtn = viewBottom.findViewById<Button>(R.id.closeUpdatePanel)
+
+                //update btn
+                updateButton.setOnClickListener {
+                    var count = 0
+                    // Validation checks (same as student)
+                    val fields = mapOf(
+                        R.id.FirstName to "First name",
+                        R.id.lastName to "Last name",
+                        R.id.address to "Address",
+                        R.id.speciality to "Speciality",
+                        R.id.email to "Email",
+                        R.id.contactNumber to "Contact number",
+                        R.id.city to "City"
+                    )
+
+                    fields.forEach { (id, name) ->
+                        val field = viewBottom.findViewById<EditText>(id)
+                        if (field.text.isNullOrBlank()) {
+                            field.setBackgroundColor(Color.parseColor("#FFD8D8"))
+                            field.setText("$name is empty")
+                            count++
+                        }
+                    }
+
+                    if (count == 0) {
+                        // Create update request
+                        val updateData = TeacherUpdateRequest(
+                            id = teacher.id,
+                            address = viewBottom.findViewById<EditText>(R.id.address).text.toString(),
+                            city = viewBottom.findViewById<EditText>(R.id.city).text.toString(),
+                            contactNumber = viewBottom.findViewById<EditText>(R.id.contactNumber).text.toString(),
+                            email = viewBottom.findViewById<EditText>(R.id.email).text.toString(),
+                            firstName = viewBottom.findViewById<EditText>(R.id.FirstName).text.toString(),
+                            lastName = viewBottom.findViewById<EditText>(R.id.lastName).text.toString(),
+                            speciality = viewBottom.findViewById<EditText>(R.id.speciality).text.toString()
+                        )
+
+                        lifecycleScope.launch {
+                            try {
+                                val result = accountDetailsTeacher.updateTeacherDetails(updateData)
+                                if (result) {
+                                    dialogView.dismiss()
+                                    Toast.makeText(requireContext(), "Data updated", Toast.LENGTH_SHORT).show()
+                                    //TODO: REFRESH PART
+                                    view?.findViewById<FrameLayout>(R.id.panelID1Accounts)
+                                        ?.removeAllViews()
+                                    val fragmentManager = requireActivity().supportFragmentManager
+                                    val fragmentTransaction = fragmentManager.beginTransaction()
+                                    fragmentTransaction.replace(R.id.panelID1Accounts, admin_accounts())
+                                    fragmentTransaction.commit()
+                                } else {
+                                    Toast.makeText(requireContext(), "Update failed", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+
+                closePanelBtn.setOnClickListener { dialogView.dismiss() }
+                dialogView.setCancelable(false)
+                dialogView.setContentView(viewBottom)
+                dialogView.show()
+            }
+
+            // Delete Button Click
+            cardView.findViewById<MaterialButton>(R.id.btnDelete).setOnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Delete Teacher Account")
+                    .setMessage("Are you sure you want to delete this teacher account?")
+                    .setPositiveButton("Delete") { dialog, _ ->
+                        lifecycleScope.launch {
+                            try {
+                                // Assuming you have a ViewModel function for deleting teachers
+                                val result = accountDetailsTeacher.removeTeacherAccount(teacher.id)
+                                if (result) {
+                                    Toast.makeText(requireContext(), "Account deleted", Toast.LENGTH_SHORT).show()
+                                    //Refresh part
+                                    view?.findViewById<FrameLayout>(R.id.panelID1Accounts)
+                                        ?.removeAllViews()
+                                    val fragmentManager = requireActivity().supportFragmentManager
+                                    val fragmentTransaction = fragmentManager.beginTransaction()
+                                    fragmentTransaction.replace(R.id.panelID1Accounts, admin_accounts())
+                                    fragmentTransaction.commit()
+                                } else {
+                                    Toast.makeText(requireContext(), "Deletion failed", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                    .show()
+            }
+
+            // View Button Click
+            cardView.findViewById<MaterialButton>(R.id.btnView).setOnClickListener {
+                val dialogViewTeacherAcc = BottomSheetDialog(requireContext())
+                val viewBottomAcc = layoutInflater.inflate(R.layout.view_teacher_acc_info, null)
+
+                // Set teacher details
+                viewBottomAcc.findViewById<TextView>(R.id.Fname).text = "First name: ${teacher.FirstName}"
+                viewBottomAcc.findViewById<TextView>(R.id.Lname).text = "Last name: ${teacher.LastName}"
+                viewBottomAcc.findViewById<TextView>(R.id.speciality).text = "Speciality: ${teacher.Speciality}"
+                viewBottomAcc.findViewById<TextView>(R.id.joinedDate).text = "Joined date: ${teacher.JoinedDate}"
+                viewBottomAcc.findViewById<TextView>(R.id.gender).text = "Gender: ${teacher.Gender}"
+                viewBottomAcc.findViewById<TextView>(R.id.mail).text = "Email: ${teacher.Email}"
+                viewBottomAcc.findViewById<TextView>(R.id.DOB).text = "Date of birth: ${teacher.DOB}"
+                viewBottomAcc.findViewById<TextView>(R.id.contactNo).text = "Contact: ${teacher.ContactNumber}"
+                viewBottomAcc.findViewById<TextView>(R.id.city).text = "City: ${teacher.City}"
+                viewBottomAcc.findViewById<TextView>(R.id.Address).text = "Address: ${teacher.Address}"
+                viewBottomAcc.findViewById<Button>(R.id.closeAccInfoBtnTeacher).setOnClickListener {
+                    dialogViewTeacherAcc.dismiss()
+                }
+                dialogViewTeacherAcc.setCancelable(false)
+                dialogViewTeacherAcc.setContentView(viewBottomAcc)
+                dialogViewTeacherAcc.show()
+            }
+
+            cardsContainer.addView(cardView)
+        }
+    }
+
     private fun renderStudentCards(students: List<StudentAccounts>) {
         cardsContainer.removeAllViews()//remove contents
         val inflater = LayoutInflater.from(requireContext())
@@ -244,7 +414,7 @@ class admin_accounts : Fragment() {
             cardView.findViewById<MaterialButton>(R.id.btnEdit).setOnClickListener {
                 //edit stu acc
                 val dialogView = BottomSheetDialog(requireContext())
-            val viewBottom = layoutInflater.inflate(R.layout.edit_student_acc, null)
+                val viewBottom = layoutInflater.inflate(R.layout.edit_student_acc, null)
                 viewBottom.findViewById<EditText>(R.id.FirstName).setText(student.firstName)
                 viewBottom.findViewById<EditText>(R.id.lastName).setText(student.lastName)
                 viewBottom.findViewById<EditText>(R.id.address).setText(student.address)
