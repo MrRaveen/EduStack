@@ -188,7 +188,7 @@ class admin_accounts : Fragment() {
             accountTypeDropdown.setOnItemClickListener { _, _, position, _ ->
 //                Toast.makeText(requireContext(), accountTypes[position], Toast.LENGTH_SHORT).show()
                 if(accountTypes[position] == "Student"){
-                    //get student acc details
+                    //get student acc details (INTO CARDS)
                     val accountDetailsViewModel by viewModels<AccountDetails>()
                     lifecycleScope.launch {
                         try{
@@ -225,7 +225,6 @@ class admin_accounts : Fragment() {
 
             }
         }
-
     }
     companion object {
         @JvmStatic
