@@ -28,6 +28,7 @@ import com.edustack.edustack.Controller.CreateAccounts
 import com.edustack.edustack.Controller.GetStudentCount
 import com.edustack.edustack.Controller.TeacherAccountDetails
 import com.edustack.edustack.Models.CreateStudentAccRequest
+import com.edustack.edustack.Models.CreateTeacherAccRequest
 import com.edustack.edustack.Models.StudentAccounts
 import com.edustack.edustack.Models.TeacherAccounts
 import com.edustack.edustack.Models.TeacherUpdateRequest
@@ -155,43 +156,162 @@ class admin_accounts : Fragment() {
                 }
             }
         }
-        //TODO: Add teacher
+//        //TODO: Add teacher
+//        val addTeacherBtn = view.findViewById<Button>(R.id.btnAddTeacher)
+//        addTeacherBtn.setOnClickListener {
+//            val dialogView = BottomSheetDialog(requireContext())
+//            val viewBottom = layoutInflater.inflate(R.layout.create_new_teacher, null)
+//            val closePanelBtn = viewBottom.findViewById<Button>(R.id.closeCreateAccTeaPanel)
+//            closePanelBtn.setOnClickListener {
+//                dialogView.dismiss()
+//            }
+//            //handle calender part
+//            //date popup
+//            val datePickerStart = Dialog(requireContext())
+//            datePickerStart.setContentView(R.layout.date_picker_start)
+//            val dateTrigButton = viewBottom.findViewById<Button>(R.id.dateForDOBTeacher)//panel side triger
+//            val dateUIStart: DatePicker = datePickerStart.findViewById(R.id.datePickerStart)//date ui/ start
+//            val dateActionBtnStart: Button = datePickerStart.findViewById(R.id.setDateStart)//date select btn/end
+//            dateTrigButton.setOnClickListener {
+//                datePickerStart.window?.setLayout(
+//                    ViewGroup.LayoutParams.WRAP_CONTENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT
+//                )
+//                datePickerStart.setCancelable(false)
+//                datePickerStart.show()
+//            }
+//            dateActionBtnStart.setOnClickListener {
+//                with(dateUIStart) {
+//                    val day = dayOfMonth
+//                    val month = month
+//                    val year = year
+//                    dateTrigButton.text = "$day/$month/$year"
+//                }
+//                datePickerStart.dismiss()
+//            }
+//            dialogView.setCancelable(false)
+//            dialogView.setContentView(viewBottom)
+//            dialogView.show()
+//        }
+
         val addTeacherBtn = view.findViewById<Button>(R.id.btnAddTeacher)
         addTeacherBtn.setOnClickListener {
             val dialogView = BottomSheetDialog(requireContext())
             val viewBottom = layoutInflater.inflate(R.layout.create_new_teacher, null)
-            val closePanelBtn = viewBottom.findViewById<Button>(R.id.closeCreateAccTeaPanel)
-            closePanelBtn.setOnClickListener {
-                dialogView.dismiss()
-            }
-            //handle calender part
-            //date popup
-            val datePickerStart = Dialog(requireContext())
-            datePickerStart.setContentView(R.layout.date_picker_start)
-            val dateTrigButton = viewBottom.findViewById<Button>(R.id.dateForDOBTeacher)//panel side triger
-            val dateUIStart: DatePicker = datePickerStart.findViewById(R.id.datePickerStart)//date ui/ start
-            val dateActionBtnStart: Button = datePickerStart.findViewById(R.id.setDateStart)//date select btn/end
-            dateTrigButton.setOnClickListener {
-                datePickerStart.window?.setLayout(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                datePickerStart.setCancelable(false)
-                datePickerStart.show()
-            }
-            dateActionBtnStart.setOnClickListener {
-                with(dateUIStart) {
-                    val day = dayOfMonth
-                    val month = month
-                    val year = year
-                    dateTrigButton.text = "$day/$month/$year"
+
+            // Initialize UI components
+            val firstNameET = viewBottom.findViewById<EditText>(R.id.FirstName)
+            val lastNameET = viewBottom.findViewById<EditText>(R.id.lastName)
+            val addressET = viewBottom.findViewById<EditText>(R.id.address)
+            val specialityET = viewBottom.findViewById<EditText>(R.id.schoolName)  // Note: schoolName is actually speciality
+            val emailET = viewBottom.findViewById<EditText>(R.id.email)
+            val contactET = viewBottom.findViewById<EditText>(R.id.contactNumber)
+            val cityET = viewBottom.findViewById<EditText>(R.id.city)
+            val usernameET = viewBottom.findViewById<EditText>(R.id.userNameNew)
+            val passwordET = viewBottom.findViewById<EditText>(R.id.userPassword)
+            val confirmPasswordET = viewBottom.findViewById<EditText>(R.id.confirmPassword)
+            val dateBtn = viewBottom.findViewById<Button>(R.id.dateForDOBTeacher)
+            val createBtn = viewBottom.findViewById<Button>(R.id.createStudentAccBtn)  // Note: Same ID as student
+
+            // Add gender selection (add spinner to XML)
+            val genderSpinner = viewBottom.findViewById<Spinner>(R.id.genderSpinner)
+            val genders = arrayOf("Male", "Female", "Other")
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, genders)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            genderSpinner.adapter = adapter
+
+            // Date picker setup
+            val datePickerDialog = DatePickerDialog(requireContext()).apply {
+                setOnDateSetListener { _, year, month, day ->
+                    // Format date as "dd/MM/yyyy"
+                    dateBtn.text = "${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/$year"
                 }
-                datePickerStart.dismiss()
+            }
+
+            dateBtn.setOnClickListener {
+                datePickerDialog.show()
+            }
+
+            createBtn.setOnClickListener {
+                // Collect data
+                val firstName = firstNameET.text.toString()
+                val lastName = lastNameET.text.toString()
+                val address = addressET.text.toString()
+                val speciality = specialityET.text.toString()
+                val email = emailET.text.toString()
+                val contact = contactET.text.toString()
+                val city = cityET.text.toString()
+                val username = usernameET.text.toString()
+                val password = passwordET.text.toString()
+                val confirmPassword = confirmPasswordET.text.toString()
+                val gender = genderSpinner.selectedItem.toString()
+                val dobString = dateBtn.text.toString()
+                // Validate data
+                if (firstName.isEmpty() || lastName.isEmpty() || address.isEmpty() ||
+                    speciality.isEmpty() || email.isEmpty() || contact.isEmpty() ||
+                    city.isEmpty() || username.isEmpty() || password.isEmpty() ||
+                    dobString == "Select here" || gender.isEmpty()) {
+                    Toast.makeText(requireContext(), "All fields are required", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (password != confirmPassword) {
+                    Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                // Convert DOB string to Firestore Timestamp
+                val dobTimestamp = try {
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val date = dateFormat.parse(dobString)
+                    Timestamp(date.time / 1000, (date.time % 1000).toInt() * 1000000)
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Invalid date format", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                // Create request object
+                val createData = CreateTeacherAccRequest(
+                    firstName = firstName,
+                    lastName = lastName,
+                    address = address,
+                    city = city,
+                    contactNumber = contact,
+                    email = email,
+                    speciality = speciality,
+                    dob = dobTimestamp,
+                    gender = gender,
+                    userName = username,
+                    password = password
+                )
+
+                // Call ViewModel to create account
+                lifecycleScope.launch {
+                    try {
+                        val success = CreateAccountsObj.CreateTeacherAccount(createData)
+                        if (success) {
+                            Toast.makeText(requireContext(), "Teacher account created", Toast.LENGTH_SHORT).show()
+                            dialogView.dismiss()
+                            // Refresh fragment
+                            view?.findViewById<FrameLayout>(R.id.panelID1Accounts)?.removeAllViews()
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.panelID1Accounts, admin_accounts())
+                                .commit()
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to create account", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            viewBottom.findViewById<Button>(R.id.closeCreateAccTeaPanel).setOnClickListener {
+                dialogView.dismiss()
             }
             dialogView.setCancelable(false)
             dialogView.setContentView(viewBottom)
             dialogView.show()
         }
+
         //TODO: Add student
         val addStudentBtn = view?.findViewById<Button>(R.id.btnAddStudent)
         addStudentBtn?.setOnClickListener {

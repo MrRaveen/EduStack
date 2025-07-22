@@ -1,16 +1,17 @@
 package com.edustack.edustack.Models
 
-import java.time.LocalDateTime
+import com.google.firebase.Timestamp
 
-data class TeacherAccCreateRequest (
+data class CreateTeacherAccRequest(
+    val firstName: String,
+    val lastName: String,
     val address: String,
     val city: String,
     val contactNumber: String,
     val email: String,
-    val firstName: String,
-    val lastName: String,
-    val speciality: String,
-    val UserName: String,
-    val Password: String,
-    val DOB: LocalDateTime,
+    val speciality: String,  // Changed from school to speciality
+    val dob: Timestamp,
+    val gender: String,
+    val userName: String,
+    val password: String
 )
