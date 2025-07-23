@@ -12,9 +12,9 @@ import android.widget.LinearLayout
 import android.widget.SearchView
 import android.widget.TextView
 import android.widget.TimePicker
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+<<<<<<< HEAD
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -27,6 +27,8 @@ import com.edustack.edustack.Controller.ClassesViewModel
 import com.edustack.edustack.Models.Course
 import com.edustack.edustack.Models.Hall
 import com.edustack.edustack.Models.TeacherDropdown
+=======
+>>>>>>> upstream/main
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -135,6 +137,7 @@ class AllClasses : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_classes)
 
+<<<<<<< HEAD
         viewModel = ViewModelProvider(this)[ClassesViewModel::class.java]
         recyclerView = findViewById(R.id.classesRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -328,20 +331,57 @@ class AllClasses : AppCompatActivity() {
 
     private fun setupTimePickers(view: View) {
         //            //start time
+=======
+        val updateBtn = findViewById<Button>(R.id.updateBottomSheetBtn)
+        val viewClassBtn = findViewById<Button>(R.id.viewClassBtn)
+
+        viewClassBtn.setOnClickListener {
+            val dialogView = BottomSheetDialog(this)
+            val viewBottom = layoutInflater.inflate(R.layout.view_class_info, null)
+            val closePanelBtn = viewBottom.findViewById<Button>(R.id.closePanelBtn)
+            closePanelBtn.setOnClickListener {
+                dialogView.dismiss()
+            }
+            dialogView.setCancelable(false)
+            dialogView.setContentView(viewBottom)
+            dialogView.show()
+        }
+
+        updateBtn.setOnClickListener {
+            val dialog = BottomSheetDialog(this)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_update_class, null)
+
+            // Cancel button
+            val dismissButton = view.findViewById<Button>(R.id.cancelButton)
+
+            // Time picker dialogs
+>>>>>>> upstream/main
             val timePicker = Dialog(this)
             timePicker.setContentView(R.layout.time_picker)
-            //end time
+
             val timePickerEnd = Dialog(this)
             timePickerEnd.setContentView(R.layout.time_picker_end)
 
-            val getTimeStart: Button = view.findViewById<Button>(R.id.timeShowBottom)//button 1 (start time)
-            val timeUI: TimePicker = timePicker.findViewById(R.id.timePickerUI)//start date
-            val setTimeBtn: Button = timePicker.findViewById(R.id.setTimeButton)//start date
+            // Start time
+            val getTimeStart: Button = view.findViewById(R.id.timeShowBottom)
+            val timeUI: TimePicker = timePicker.findViewById(R.id.timePickerUI)
+            val setTimeBtn: Button = timePicker.findViewById(R.id.setTimeButton)
 
-            val getTimeEnd: Button = view.findViewById(R.id.timeShowEndBottom)//button 2 (end time)
-            val timeUIEnd: TimePicker = timePickerEnd.findViewById(R.id.timePickerUIEnd)//end
-            val setTimeBtnEnd: Button = timePickerEnd.findViewById(R.id.setTimeButtonEnd)//end
-            getTimeEnd.setOnClickListener{
+            // End time
+            val getTimeEnd: Button = view.findViewById(R.id.timeShowEndBottom)
+            val timeUIEnd: TimePicker = timePickerEnd.findViewById(R.id.timePickerUIEnd)
+            val setTimeBtnEnd: Button = timePickerEnd.findViewById(R.id.setTimeButtonEnd)
+
+            getTimeStart.setOnClickListener {
+                timePicker.window?.setLayout(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                timePicker.setCancelable(false)
+                timePicker.show()
+            }
+
+            getTimeEnd.setOnClickListener {
                 timePickerEnd.window?.setLayout(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -349,31 +389,27 @@ class AllClasses : AppCompatActivity() {
                 timePickerEnd.setCancelable(false)
                 timePickerEnd.show()
             }
-            getTimeStart.setOnClickListener{
-                timePicker.window?.setLayout(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                timePicker.setCancelable(false)
-                timePicker.show()
 
-            }
-            timeUI.setOnTimeChangedListener { view, hourOfDay, minute ->
+            timeUI.setOnTimeChangedListener { _, hourOfDay, minute ->
                 val selectedTime = String.format("%02d:%02d", hourOfDay, minute)
-                getTimeStart.setText(selectedTime)
+                getTimeStart.text = selectedTime
             }
-            timeUIEnd.setOnTimeChangedListener { view, hourOfDay, minute ->
+
+            timeUIEnd.setOnTimeChangedListener { _, hourOfDay, minute ->
                 val selectedTime = String.format("%02d:%02d", hourOfDay, minute)
-                getTimeEnd.setText(selectedTime)
+                getTimeEnd.text = selectedTime
             }
+
             setTimeBtn.setOnClickListener {
                 timePicker.dismiss()
             }
+
             setTimeBtnEnd.setOnClickListener {
                 timePickerEnd.dismiss()
             }
     }
 
+<<<<<<< HEAD
     private fun updateClass(course: Course, view: View, dialog: BottomSheetDialog) {
         val name = view.findViewById<EditText>(R.id.className).text.toString()
         val description = view.findViewById<EditText>(R.id.descrionClass).text.toString()
@@ -403,11 +439,21 @@ class AllClasses : AppCompatActivity() {
             val success = viewModel.updateClass(course.id, updates)
             if (success) {
                 Toast.makeText(this@AllClasses, "Class updated", Toast.LENGTH_SHORT).show()
+=======
+            dismissButton.setOnClickListener {
+>>>>>>> upstream/main
                 dialog.dismiss()
                 loadClasses()
             } else {
                 Toast.makeText(this@AllClasses, "Update failed", Toast.LENGTH_SHORT).show()
             }
+<<<<<<< HEAD
+=======
+
+            dialog.setCancelable(false)
+            dialog.setContentView(view)
+            dialog.show()
+>>>>>>> upstream/main
         }
     }
 }

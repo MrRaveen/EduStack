@@ -442,7 +442,7 @@ class ClassCalender : AppCompatActivity() {
             timePickerEnd.findViewById<Button>(R.id.setTimeButtonEnd).setOnClickListener {
                 timePickerEnd.dismiss()
             }
-        }
+        } 
 
         // Save button
         val saveBtn = view.findViewById<Button>(R.id.updateInfoBtn)
